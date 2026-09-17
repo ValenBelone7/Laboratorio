@@ -35,7 +35,16 @@ def inquilinos_con_deuda(contratos):
     sea "pendiente" o "vencido", en el mismo orden en que aparecen.
     Usá un for normal (todavía sin comprensión).
     """
-    raise NotImplementedError
+
+    inquilinos_deudores = []
+
+    for c in contratos:
+        if c["estado"] == "pendiente" or c["estado"] == "vencido":
+            # 💡 más idiomático: c["estado"] in ("pendiente", "vencido")
+            # evita repetir c["estado"] dos veces. Mismo caso en total_adeudado, abajo.
+            inquilinos_deudores.append(c["inquilino"])
+
+    return inquilinos_deudores
 
 
 # ---------------------------------------------------------------
@@ -45,9 +54,14 @@ def total_adeudado(contratos):
     """
     Devolvé la suma de los montos de los contratos "pendiente" o "vencido".
     """
-    raise NotImplementedError
 
+    montos_sumados = 0
 
+    for c in contratos:
+        if c["estado"] == "pendiente" or c["estado"] == "vencido":
+            montos_sumados += c['monto']
+
+    return montos_sumados
 # ---------------------------------------------------------------
 # Ejercicio 3: El patrón "agrupar"
 # ---------------------------------------------------------------
@@ -58,7 +72,18 @@ def agrupar_por_indice(contratos):
 
     Ejemplo de forma:  {"ICL": [1, 5], ...}
     """
-    raise NotImplementedError
+
+    ids_por_indice = {}
+
+    for c in contratos:
+        clave = c["indice"]              # "ICL", "IPC" o "Casa Propia"
+
+        if clave not in ids_por_indice:
+            ids_por_indice[clave] = []  # ← ¿con qué arranca la clave la primera vez?
+
+        ids_por_indice[clave].append(c["id"])  # ← ¿qué método de lista agrega UN elemento al final?
+
+    return ids_por_indice
 
 
 # ---------------------------------------------------------------
@@ -71,8 +96,14 @@ def aplicar_aumento(monto, porcentaje):
 
     Ejemplo: aplicar_aumento(200000, 10) -> (220000.0, 20000.0)
     """
-    raise NotImplementedError
 
+    nuevo_monto = monto * (1 + porcentaje / 100)
+    diferencia = nuevo_monto - monto
+    return round(nuevo_monto), round(diferencia)
+    # ⚠️ falta el segundo parámetro de round() (ndigits=2) → así redondea a ENTERO.
+    # Con estos números da igual porque el resultado cae redondo, pero con
+    # decimales reales (ej: aplicar_aumento(100000, 7.3)) perdés precisión
+    # sin que salte ningún error. Debería ser: round(nuevo_monto, 2), round(diferencia, 2)
 
 # ---------------------------------------------------------------
 # Ejercicio 5: Sets
@@ -86,7 +117,29 @@ def comparar_exchanges(monedas_a, monedas_b):
       "todas":    todas las monedas sin repetir
     Cada valor tiene que ser un set. Usá operadores de conjuntos, no for.
     """
-    raise NotImplementedError
+
+    conjuntos = {
+        'en_ambos':0,
+        'solo_a':0,
+        'solo_b':0,
+        'todas':0
+    }
+    # 👆 estos 4 valores en 0 nunca se leen: las 4 líneas de abajo los pisan sin
+    # ninguna condición. Un dev que revise esto se pregunta "¿para qué inicializo
+    # algo que siempre se sobreescribe?". Se puede ir directo al resultado final:
+    #   return {
+    #       "en_ambos": monedas_a & monedas_b,
+    #       "solo_a": monedas_a - monedas_b,
+    #       "solo_b": monedas_b - monedas_a,
+    #       "todas": monedas_a | monedas_b,
+    #   }
+
+    conjuntos['en_ambos'] = monedas_a & monedas_b
+    conjuntos['solo_a'] = monedas_a - monedas_b
+    conjuntos['solo_b'] = monedas_b - monedas_a
+    conjuntos["todas"] = monedas_a | monedas_b
+
+    return conjuntos
 
 
 # ---------------------------------------------------------------
@@ -97,15 +150,21 @@ def montos_con_aumento(contratos, porcentaje):
     Con UNA comprensión de lista, devolvé los montos con el aumento
     aplicado, redondeados a 2 decimales.
     """
-    raise NotImplementedError
+
+    con_aumento = [round(c['monto'] * (1 + porcentaje / 100)) for c in contratos]
+    # ⚠️ mismo problema que en aplicar_aumento: falta el ndigits=2 → round(..., 2)
+
+    return con_aumento
 
 
 def indice_por_id(contratos):
     """
     Con UNA comprensión de diccionario, devolvé {id: indice}.
     """
-    raise NotImplementedError
 
+    id_indice = {c['id']:c['indice'] for c in contratos}
+
+    return id_indice
 
 # ---------------------------------------------------------------
 # Ejercicio 7 (desafío): Resumen de trades
@@ -118,7 +177,21 @@ def resumen_trades(trades):
       {"BTCUSDT": {"ganados": 2, "perdidos": 1}, ...}
     Todos los pares tienen que tener ambas claves, aunque valgan 0.
     """
-    raise NotImplementedError
+
+    resumen = {}
+
+    for par, resultado in trades:
+        if par not in resumen:
+            resumen[par] = {'ganados':0,'perdidos':0}              # (1) ¿qué diccionario "vacío" necesito acá?
+
+        if resultado > 0:
+            resumen[par]["ganados"] +=1     # (2)
+        else:
+            resumen[par]["perdidos"] += 1    # (2)
+
+    return resumen
+
+        
 
 
 # ===============================================================
