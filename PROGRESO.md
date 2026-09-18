@@ -52,8 +52,17 @@ para arrancar la lección 02 (manejo de errores, archivos con `with`, JSON).
   - `with open(...)` + `json.dump`/`json.load` para escribir y leer archivos,
     incluyendo el manejo de `FileNotFoundError` y `json.JSONDecodeError`.
   - 17/17 ejercicios resueltos, con dos rondas de corrección.
-  - Repaso (`repaso.py`, mismo día): 14/14 sin ayuda, incluyendo el ejercicio
-    nuevo sobre `finally` con una excepción que se deja sin capturar.
+  - Repaso (`repaso.py`, 18-09-2026): 14/14. Resolvió solo los ejercicios 1-4
+    y 6; en el 5 (`guardar_historial_trades`) necesitó dos pistas: primero
+    `.append(par, resultado)` con dos argumentos en vez de un dict
+    (`list.append()` solo acepta uno), después un `if par not in
+    diccionario_trades['trades']` que comparaba un string contra una lista
+    de diccionarios y por lo tanto era siempre `True` (no filtraba nada) —
+    entendió por qué en ambos casos, no solo cambió código hasta que pasó.
+  - El ejercicio 2 del repaso (`cerrar_posicion`, con un `ZeroDivisionError`
+    sin capturar a propósito) terminó de cerrar el matiz de `finally` de
+    abajo: lo resolvió bien en código, dejando la excepción sin `except` y
+    confiando en que `finally` corra igual.
 - Qué me costó:
   - Ejercicio 7 (primera entrega): el `try` envolvía solo `json.load(f)`, pero
     el `with open(ruta, ...)` que puede lanzar `FileNotFoundError` estaba
@@ -76,5 +85,11 @@ para arrancar la lección 02 (manejo de errores, archivos con `with`, JSON).
   - Ninguno crítico. Tener presente el matiz de `finally` de arriba si en
     Fase 2 (Django) aparecen casos de limpieza de recursos con excepciones
     que se dejan propagar (por ejemplo, `transaction.atomic()`).
+  - Comentó que "perdió el feeling" de la lección 01 mientras hacía el
+    repaso de la 02, y tuvo que releer teoría y ejercicios de esa lección.
+    No detectó errores nuevos al repasarla — es señal normal de no haber
+    practicado colecciones en unos días, no de que la lección 01 quedó mal
+    aprendida. Si se repite en lecciones futuras, considerar mezclar algún
+    ejercicio de repaso de fases anteriores dentro de las nuevas lecciones.
 - Listo para arrancar la lección 03 (módulos, paquetes, entornos virtuales,
   `uv`, consumir APIs con `requests`).

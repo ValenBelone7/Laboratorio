@@ -38,9 +38,14 @@ def obtener_precio_par(ruta, par):
     devolvé None.
     """
 
-    raise NotImplementedError
-
-
+    try:
+        with open(ruta,'r',encoding='utf-8') as f:
+            data = json.load(f)
+        precio = data[par]
+    except (FileNotFoundError, json.JSONDecodeError,KeyError,TypeError):
+        return None
+    else:
+        return precio
 # ---------------------------------------------------------------
 # 2. finally vs. duplicar en try/except
 # ---------------------------------------------------------------
@@ -60,8 +65,14 @@ def cerrar_posicion(posiciones, par, precio_actual, cierres):
       "cierres". Usá finally para esto.
     """
 
-    raise NotImplementedError
-
+    try:
+        resultado = (precio_actual - posiciones[par]) / posiciones[par] * 100
+    except KeyError:
+        return None
+    else:
+        return round(resultado,2)
+    finally:
+        cierres.append('cierre')
 
 # ---------------------------------------------------------------
 # 3. Validar tipos de verdad (no con float())
@@ -83,10 +94,15 @@ def sumar_montos_validos(registros):
     justo lo que NO queremos aceptar acá — un monto que llegó como
     texto es un dato roto, no algo para "arreglar" en silencio.
     """
+    suma_total = 0
+    cantidad_invalidos = 0
+    for r in registros:
+        try:
+            suma_total += r['monto'] + 0
+        except (KeyError, TypeError):
+            cantidad_invalidos += 1
 
-    raise NotImplementedError
-
-
+    return suma_total,cantidad_invalidos
 # ---------------------------------------------------------------
 # 4. Excepción propia con varios atributos
 # ---------------------------------------------------------------
@@ -101,7 +117,10 @@ class SaldoInsuficienteError(Exception):
     """
 
     def __init__(self, exchange, monto_solicitado, saldo_disponible):
-        raise NotImplementedError
+        self.exchange = exchange
+        self.monto_solicitado = monto_solicitado
+        self.saldo_disponible = saldo_disponible
+        super().__init__(f'{exchange} Error: Intenta retirar {monto_solicitado} y es mas del monto disponibl0e. Monto disponible: {saldo_disponible}')
 
 
 def retirar_fondos(saldos, exchange, monto):
@@ -115,9 +134,12 @@ def retirar_fondos(saldos, exchange, monto):
       resultado y devolvelo.
     """
 
-    raise NotImplementedError
+    if monto > saldos.get(exchange,0):
+        raise SaldoInsuficienteError(exchange,monto,saldos[exchange])
+    else:
+        resultado = saldos[exchange] - monto
 
-
+    return resultado
 # ---------------------------------------------------------------
 # 5. with + JSON de escritura, transformando los datos antes
 # ---------------------------------------------------------------
@@ -137,9 +159,16 @@ def guardar_historial_trades(ruta, trades):
     Tenés que transformar la lista de tuplas en la lista de diccionarios
     ANTES de escribirla. Usá with + json.dump, con indent=2.
     """
-
-    raise NotImplementedError
-
+    diccionario_trades = {'total_trades':0,'trades':[]}
+    for par, resultado in trades:
+        diccionario_trades["total_trades"] += 1
+        diccionario_trades['trades'].append({"par":par,"resultado":resultado})
+    
+    try:
+        with open(ruta,'w',encoding='utf-8') as f:
+            json.dump(diccionario_trades,f,ensure_ascii=False,indent=2)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return None
 
 # ---------------------------------------------------------------
 # 6. Lectura de JSON con un default que viene por parámetro
@@ -153,8 +182,13 @@ def cargar_configuracion(ruta, valores_default):
       en este ejercicio el default lo decide quien llama a la función).
     """
 
-    raise NotImplementedError
-
+    try:
+        with open(ruta,'r',encoding='utf-8') as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return valores_default
+    else:
+        return data
 
 # ===============================================================
 # Verificación
