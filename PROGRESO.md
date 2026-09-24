@@ -2,7 +2,8 @@
 
 ## Estado general
 - Fase actual: 1 (Python)
-- Lección actual: 02 (Manejo de errores, archivos y JSON) — cerrada, repaso hecho
+- Lección actual: 03 (Módulos, paquetes, entornos virtuales, `uv` y APIs con `requests`)
+- Lecciones cerradas: 01 (con repaso), 02 (con repaso)
 
 ## Registro
 
